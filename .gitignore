@@ -1,0 +1,28 @@
+# Environments
+venv/
+env/
+titanic_env/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files
+*.csv
+*.xlsx
+*.pkl
+*.log
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Output / temp
+*.h5
+*.model
+*.sav
