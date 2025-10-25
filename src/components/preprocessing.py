@@ -23,23 +23,23 @@ class Preprocessing:
     def get_data_preprocesser_object(self):
         try:
             num_feature = ['Age','Fare']
-            binary_feature = ["Sex",'Sibsp','Parch']
+            binary_feature = ["Sex"]
             multi_feature = ["Embarked", "Pclass"]
             
             num_pipeline = Pipeline(
                 steps=[
-                    ("imputer", SimpleImputer(strategy="median"))
+                    ("imputer", SimpleImputer(strategy="median")),
                     ('scaler', StandardScaler())
                 ]
             )
             binary_pipeline = Pipeline(
                 steps=[
-                    ("imputer", SimpleImputer(strategy="most_frequent"))
+                    ("imputer", SimpleImputer(strategy="most_frequent")),
                     ("label_encoder", OrdinalEncoder())  
                 ])   
             multi_cat_pipeline = Pipeline(
                 steps=[
-                    ("imputer", SimpleImputer(strategy="most_frequent"))
+                    ("imputer", SimpleImputer(strategy="most_frequent")),
                     ("one_hot_encoder", OneHotEncoder(handle_unknown="ignore"))
                 ])
             
@@ -68,21 +68,28 @@ class Preprocessing:
             preprocessing_obj = self.get_data_preprocesser_object()
             
             target_column = 'Survived'
-            
-            input_feature_train_df = train_df.drop(columns=[target_column],axis=1)
-            input_feature_test_df = test_df.drop(columns=[target_column],axis=1)
-            
+
+            input_feature_train_df = train_df.drop(columns=[target_column], axis=1)
             target_feature_train_df = train_df[target_column]
-            target_feature_test_df = test_df[target_column]
+
+            if target_column in test_df.columns:
+                input_feature_test_df = test_df.drop(columns=[target_column], axis=1)
+                target_feature_test_df = test_df[target_column]
+            else:
+                input_feature_test_df = test_df.copy()
+                target_feature_test_df = None
             
             logging.info('Applying preprocessing object on training and testing dataframe')
             
             input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_train_df)
-            input_feature_test_arr = preprocessing_obj.fit_transform(input_feature_test_df)
+            input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)
             
             train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]
-            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
-            
+            if target_feature_test_df is not None:
+                test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
+            else:
+                test_arr = input_feature_test_arr
+
             logging.info('Saved preprocessed file')
             
             save_object(

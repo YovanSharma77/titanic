@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 from src.exception import CustomException
 from src.logger import logging
+from src.components.preprocessing import DataPreprocessingConfig, Preprocessing
 
 class DataLoader:
     def __init__(self,train_path:str, test_path: str):
@@ -45,7 +46,13 @@ if __name__ == "__main__":
     
     loader = DataLoader(train_file,test_file)
     train_df, test_df = loader.load_data()
-    print(train_df.head())
-    print('-'*40)
-    print(test_df.head())
-            
+    
+    preprocessing = Preprocessing()
+    
+    train_arr, test_arr, preprocessor_path = preprocessing.initiate_data_preprocessing(
+        train_path=train_file,
+        test_path=test_file
+    )
+    
+    print("Preprocessing completed successfully!")
+    print(f"Preprocessor object saved at: {preprocessor_path}")
